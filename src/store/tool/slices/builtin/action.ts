@@ -1,8 +1,7 @@
-import pMap from 'p-map';
 import { StateCreator } from 'zustand/vanilla';
 
-import { imageGenerationService } from '@/services/imageGeneration';
 import { OpenAIImagePayload } from '@/types/openai/image';
+import { DallEImageItem } from '@/types/tool/dalle';
 import { setNamespace } from '@/utils/storeDebug';
 
 import { ToolStore } from '../../store';
@@ -18,7 +17,7 @@ interface Text2ImageParams extends Pick<OpenAIImagePayload, 'quality' | 'style' 
  */
 export interface BuiltinToolAction {
   invokeBuiltinTool: (key: string, params: any) => Promise<string | undefined>;
-  text2image: (params: Text2ImageParams) => Promise<any>;
+  text2image: (params: Text2ImageParams, messageId: string) => DallEImageItem[];
   toggleBuiltinToolLoading: (key: string, value: boolean) => void;
 }
 
@@ -46,22 +45,9 @@ export const createBuiltinToolSlice: StateCreator<
 
     return JSON.stringify(result);
   },
-  text2image: async ({ prompts, size, quality, style }) => {
-    const data = await pMap(prompts, async (prompt) => {
-      const urls = await imageGenerationService.generateImage({ prompt, quality, size, style });
+  text2image: ({ prompts, size = '1024x1024' as const, quality = 'standard', style = 'vivid' }) =>
+    prompts.map((p) => ({ prompt: p, quality, size, style })),
 
-      return {
-        prompt,
-        quality: quality || 'standard',
-        size: size || '1024x1024',
-        style: style || 'vivid',
-        url: urls[0],
-      };
-    });
-    console.log(data);
-
-    return data;
-  },
   toggleBuiltinToolLoading: (key, value) => {
     set({ builtinToolLoading: { [key]: value } }, false, n('toggleBuiltinToolLoading'));
   },
