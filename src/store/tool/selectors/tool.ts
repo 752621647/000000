@@ -3,13 +3,14 @@ import { uniqBy } from 'lodash-es';
 import { Md5 } from 'ts-md5';
 
 import { PLUGIN_SCHEMA_API_MD5_PREFIX, PLUGIN_SCHEMA_SEPARATOR } from '@/const/plugin';
-import { pluginHelpers } from '@/store/tool';
 import { ToolStoreState } from '@/store/tool/initialState';
 import { builtinToolSelectors } from '@/store/tool/slices/builtin/selectors';
 import { pluginSelectors } from '@/store/tool/slices/plugin/selectors';
 import { MetaData } from '@/types/meta';
 import { ChatCompletionFunctions } from '@/types/openai/chat';
 import { LobeToolMeta } from '@/types/tool/tool';
+
+import { pluginHelpers } from '../helpers';
 
 const enabledSchema =
   (tools: string[] = []) =>
